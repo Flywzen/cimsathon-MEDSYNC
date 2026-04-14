@@ -1,0 +1,369 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.app{background:#f5f5f3;min-height:600px;}
+.screen{display:none;}
+.screen.active{display:block;}
+
+.topbar{background:#ffffff;border-bottom:0.5px solid #e0ddd4;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.logo{font-size:15px;font-weight:500;color:#1a1a1a;letter-spacing:-.3px;}
+.logo span{color:#185FA5;}
+.badge-live{background:#EAF3DE;color:#3B6D11;font-size:12px;padding:3px 8px;border-radius:100px;font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:8px;font-size:12px;color:#888780;}
+.dot{width:6px;height:6px;border-radius:50%;background:#639922;display:inline-block;}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:520px;display:flex;align-items:center;justify-content:center;padding:32px 16px;background:#f5f5f3;}
+.login-card{background:#ffffff;border:0.5px solid #e0ddd4;border-radius:12px;padding:28px 28px;width:100%;max-width:340px;}
+.login-brand{text-align:center;margin-bottom:20px;}
+.login-brand-logo{font-size:20px;font-weight:500;color:#1a1a1a;letter-spacing:-.3px;}
+.login-brand-logo span{color:#185FA5;}
+.login-brand-sub{font-size:11px;color:#888780;margin-top:3px;}
+.login-rs{font-size:11px;color:#888780;margin-bottom:16px;padding:8px 12px;background:#f5f5f3;border-radius:8px;display:flex;align-items:center;gap:6px;border:0.5px solid #e0ddd4;}
+.login-err{display:none;font-size:11px;color:#993C1D;background:#FAECE7;border-radius:8px;padding:7px 10px;margin-bottom:12px;border:0.5px solid #F5C4B3;}
+.login-err.show{display:block;}
+.form-label{font-size:12px;font-weight:500;color:#888780;margin-bottom:5px;display:block;}
+.form-group{margin-bottom:12px;}
+.form-input{width:100%;padding:8px 10px;font-size:13px;border:0.5px solid #c8c6bd;border-radius:8px;background:#f5f5f3;color:#1a1a1a;font-family:inherit;}
+.form-input:focus{outline:none;border-color:#185FA5;}
+.btn-primary{width:100%;padding:10px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:-.1px;}
+.btn-primary:hover{background:#0C447C;}
+.login-note{font-size:10px;color:#888780;text-align:center;margin-top:12px;line-height:1.5;}
+
+/* ── DASHBOARD ── */
+.dash-search-area{padding:12px 16px;background:#ffffff;border-bottom:0.5px solid #e0ddd4;}
+.section-label{font-size:11px;font-weight:500;color:#888780;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.search-row{display:flex;gap:8px;margin-bottom:8px;}
+.search-input{flex:1;padding:8px 10px;font-size:13px;border:0.5px solid #c8c6bd;border-radius:8px;background:#f5f5f3;color:#1a1a1a;font-family:inherit;}
+.search-input:focus{outline:none;border-color:#185FA5;}
+.btn-add{padding:8px 14px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.method-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.method-btn{padding:6px 8px;border:0.5px solid #c8c6bd;border-radius:8px;background:#f5f5f3;font-size:11px;color:#888780;cursor:pointer;font-family:inherit;text-align:center;}
+.method-btn.active-m{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4;}
+
+.dash-content{padding:12px 16px 16px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.stat{background:#ffffff;border:0.5px solid #e0ddd4;border-radius:8px;padding:10px 12px;text-align:center;}
+.stat-n{font-size:20px;font-weight:500;color:#1a1a1a;}
+.stat-l{font-size:10px;color:#888780;margin-top:2px;}
+
+.pasien-card{background:#ffffff;border:0.5px solid #e0ddd4;border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.pasien-card-header{padding:8px 12px;border-bottom:0.5px solid #e0ddd4;display:flex;align-items:center;gap:6px;}
+.pc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.pc-title{font-size:11px;font-weight:500;color:#888780;text-transform:uppercase;letter-spacing:.5px;}
+.pasien-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:0.5px solid #e0ddd4;cursor:pointer;}
+.pasien-row:last-child{border-bottom:none;}
+.pasien-row:hover{background:#f5f5f3;}
+.pr-avatar{width:32px;height:32px;border-radius:50%;background:#B5D4F4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#0C447C;flex-shrink:0;margin-right:10px;}
+.pr-left{display:flex;align-items:center;}
+.pr-name{font-size:13px;font-weight:500;color:#1a1a1a;}
+.pr-meta{font-size:11px;color:#888780;margin-top:1px;}
+.pr-badge{font-size:10px;padding:3px 9px;border-radius:100px;font-weight:500;}
+.pr-badge.active{background:#FAECE7;color:#993C1D;}
+.pr-badge.update{background:#FAEEDA;color:#854F0B;}
+.pr-badge.done{background:#EAF3DE;color:#3B6D11;}
+
+.footer-bar{padding:10px 16px;background:#ffffff;border-top:0.5px solid #e0ddd4;display:flex;align-items:center;justify-content:space-between;}
+.f-user{font-size:11px;color:#888780;}
+.btn-logout{font-size:11px;color:#993C1D;background:none;border:0.5px solid #F5C4B3;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit;}
+
+/* ── INPUT PASIEN ── */
+.ip-header{background:#ffffff;border-bottom:0.5px solid #e0ddd4;padding:10px 16px;display:flex;align-items:center;gap:10px;}
+.btn-back{background:none;border:none;font-size:16px;color:#888780;cursor:pointer;padding:0;line-height:1;}
+.ip-title{font-size:14px;font-weight:500;color:#1a1a1a;}
+.ip-body{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+.ip-card{background:#ffffff;border:0.5px solid #e0ddd4;border-radius:12px;padding:14px;}
+.ip-divider{display:flex;align-items:center;gap:8px;margin:6px 0 10px;}
+.ip-divider-line{flex:1;height:0.5px;background:#e0ddd4;}
+.ip-divider-text{font-size:10px;color:#888780;}
+.btn-find{width:100%;padding:10px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
+.btn-find:hover{background:#0C447C;}
+
+.loading-bar{display:none;padding:10px 16px;}
+.loading-bar.show{display:block;}
+.loading-track{height:3px;background:#e0ddd4;border-radius:2px;overflow:hidden;}
+.loading-fill{height:3px;background:#185FA5;border-radius:2px;width:0%;transition:width .8s ease;}
+.loading-text{font-size:11px;color:#888780;margin-top:6px;text-align:center;}
+
+.found-card{display:none;margin:0 16px;background:#E6F1FB;border:0.5px solid #B5D4F4;border-radius:12px;padding:12px 14px;}
+.found-card.show{display:block;}
+.found-name{font-size:15px;font-weight:500;color:#0C447C;}
+.found-meta{font-size:11px;color:#185FA5;margin-top:2px;}
+.found-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;}
+.found-tag{font-size:10px;padding:2px 8px;border-radius:100px;background:#B5D4F4;color:#0C447C;font-weight:500;}
+
+.notfound-card{display:none;margin:0 16px;background:#FAECE7;border:0.5px solid #F5C4B3;border-radius:12px;padding:12px 14px;font-size:12px;color:#712B13;line-height:1.5;}
+.notfound-card.show{display:block;}
+
+.btn-access{display:none;width:calc(100% - 32px);margin:10px 16px 14px;padding:10px;background:#D85A30;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
+.btn-access.show{display:block;}
+.btn-access:hover{background:#993C1D;}
+</style>
+
+<div class="app" id="app">
+
+  <!-- ══ SCREEN 1: LOGIN ══ -->
+  <div class="screen active" id="s-login">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo"><span>MED</span>SYNC</div>
+      </div>
+      <div class="topbar-right">Sistem Integrasi Data Klinis IGD</div>
+    </div>
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="login-brand-logo"><span>MED</span>SYNC</div>
+          <div class="login-brand-sub">Medical Emergency Data Synchronization</div>
+        </div>
+        <div class="login-rs">
+          <div class="dot"></div>
+          <span>RSUP Dr. Mohammad Hoesin — IGD</span>
+        </div>
+        <div class="login-err" id="login-err">ID atau kata sandi tidak dikenali. Hubungi admin RS.</div>
+        <div class="form-group">
+          <label class="form-label">ID tenaga kesehatan</label>
+          <input class="form-input" id="inp-id" type="text" placeholder="cth: dr.andi@rsmh.id" value="dr.andi@rsmh.id"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kata sandi</label>
+          <input class="form-input" id="inp-pw" type="password" value="••••••••"/>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Masuk ke MEDSYNC</button>
+        <div class="login-note">Akses hanya untuk tenaga kesehatan terdaftar.<br>Seluruh aktivitas dicatat dalam audit log.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: DASHBOARD ══ -->
+  <div class="screen" id="s-dash">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo"><span>MED</span>SYNC</div>
+        <div class="badge-live">Data Terintegrasi</div>
+      </div>
+      <div class="topbar-right">
+        <div class="dot"></div>
+        dr. Andi Pratama · IGD RSUP M. Hoesin
+      </div>
+    </div>
+    <div class="dash-search-area">
+      <div class="section-label">Cari pasien baru</div>
+      <div class="search-row">
+        <input class="search-input" type="text" placeholder="Ketik NIK, No. BPJS, atau nama pasien..."/>
+        <button class="btn-add" onclick="goInput()">+ Input manual</button>
+      </div>
+      <div class="method-row">
+        <div class="method-btn active-m" onclick="setMethod(this)">NIK</div>
+        <div class="method-btn" onclick="setMethod(this)">No. BPJS</div>
+        <div class="method-btn" onclick="setMethod(this)">Nama + tgl lahir</div>
+      </div>
+    </div>
+    <div class="dash-content">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n">7</div><div class="stat-l">Pasien hari ini</div></div>
+        <div class="stat"><div class="stat-n">2</div><div class="stat-l">Sedang ditangani</div></div>
+        <div class="stat"><div class="stat-n">5</div><div class="stat-l">Selesai shift ini</div></div>
+      </div>
+      <div class="pasien-card">
+        <div class="pasien-card-header">
+          <div class="pc-dot" style="background:#E24B4A;"></div>
+          <div class="pc-title">Pasien aktif shift ini</div>
+        </div>
+        <div class="pasien-row" onclick="goInput()">
+          <div class="pr-left">
+            <div class="pr-avatar">BS</div>
+            <div>
+              <div class="pr-name">Bambang Sutrisno</div>
+              <div class="pr-meta">62 th · RM 0023-4571 · Masuk 14:22</div>
+            </div>
+          </div>
+          <span class="pr-badge active">Darurat</span>
+        </div>
+        <div class="pasien-row" onclick="goInput()">
+          <div class="pr-left">
+            <div class="pr-avatar" style="background:#9FE1CB;color:#085041;">SR</div>
+            <div>
+              <div class="pr-name">Siti Rahayu</div>
+              <div class="pr-meta">45 th · RM 0019-2231 · Masuk 13:10</div>
+            </div>
+          </div>
+          <span class="pr-badge update">Perlu update</span>
+        </div>
+      </div>
+      <div class="pasien-card">
+        <div class="pasien-card-header">
+          <div class="pc-dot" style="background:#639922;"></div>
+          <div class="pc-title">Selesai hari ini</div>
+        </div>
+        <div class="pasien-row">
+          <div class="pr-left">
+            <div class="pr-avatar" style="background:#D3D1C7;color:#444441;">AF</div>
+            <div>
+              <div class="pr-name">Ahmad Fauzi</div>
+              <div class="pr-meta">62 th · RM 0031-8812 · Selesai 12:45</div>
+            </div>
+          </div>
+          <span class="pr-badge done">Selesai</span>
+        </div>
+        <div class="pasien-row">
+          <div class="pr-left">
+            <div class="pr-avatar" style="background:#D3D1C7;color:#444441;">DL</div>
+            <div>
+              <div class="pr-name">Dewi Lestari</div>
+              <div class="pr-meta">34 th · RM 0044-1190 · Selesai 11:20</div>
+            </div>
+          </div>
+          <span class="pr-badge done">Selesai</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <div class="f-user">dr. Andi Pratama · Shift pagi · Tersinkronisasi SATUSEHAT</div>
+      <button class="btn-logout" onclick="doLogout()">Keluar</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: INPUT IDENTITAS PASIEN ══ -->
+  <div class="screen" id="s-input">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo"><span>MED</span>SYNC</div>
+        <div class="badge-live">Data Terintegrasi</div>
+      </div>
+      <div class="topbar-right">
+        <div class="dot"></div>
+        dr. Andi Pratama · IGD
+      </div>
+    </div>
+    <div class="ip-header">
+      <button class="btn-back" onclick="goBack()">&#8592;</button>
+      <div class="ip-title">Identifikasi pasien baru</div>
+    </div>
+    <div class="ip-body">
+      <div class="ip-card">
+        <div class="form-group">
+          <label class="form-label">NIK (Nomor Induk Kependudukan)</label>
+          <input class="form-input" type="text" placeholder="16 digit NIK" id="inp-nik" value="3271234567890001"/>
+        </div>
+        <div class="ip-divider">
+          <div class="ip-divider-line"></div>
+          <div class="ip-divider-text">atau</div>
+          <div class="ip-divider-line"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nomor BPJS Kesehatan</label>
+          <input class="form-input" type="text" placeholder="13 digit nomor BPJS" id="inp-bpjs"/>
+        </div>
+        <div class="ip-divider">
+          <div class="ip-divider-line"></div>
+          <div class="ip-divider-text">atau nama + tanggal lahir (fallback)</div>
+          <div class="ip-divider-line"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama lengkap</label>
+          <input class="form-input" type="text" placeholder="Nama sesuai KTP" id="inp-nama"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Tanggal lahir</label>
+          <input class="form-input" type="text" placeholder="DD/MM/YYYY" id="inp-dob"/>
+        </div>
+      </div>
+      <button class="btn-find" onclick="doSearch()">Cari data di SATUSEHAT</button>
+    </div>
+
+    <div class="loading-bar" id="loading-bar">
+      <div class="loading-track"><div class="loading-fill" id="loading-fill"></div></div>
+      <div class="loading-text" id="loading-text">Menghubungi SATUSEHAT...</div>
+    </div>
+
+    <div class="found-card" id="found-card">
+      <div class="found-name">Bambang Sutrisno</div>
+      <div class="found-meta">NIK: 3271234567890001 · BPJS: 0002-2345-6789 · Gol. A+</div>
+      <div class="found-tags">
+        <span class="found-tag">62 tahun · L</span>
+        <span class="found-tag">3 kondisi kronis</span>
+        <span class="found-tag">4 obat aktif</span>
+        <span class="found-tag">Data dari 3 fasilitas</span>
+        <span class="found-tag">Terakhir: 10 Apr 2026</span>
+      </div>
+    </div>
+
+    <div class="notfound-card" id="notfound-card">
+      Data pasien tidak ditemukan di SATUSEHAT. Lanjutkan dengan anamnesis manual. Penanganan tetap bisa didokumentasikan setelah pasien stabil.
+    </div>
+
+    <button class="btn-access" id="btn-access" onclick="goEmergency()">
+      Buka clinical summary darurat &#8594;
+    </button>
+  </div>
+
+</div>
+
+<script>
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+}
+function doLogin(){
+  var id=document.getElementById('inp-id').value.trim();
+  var pw=document.getElementById('inp-pw').value.trim();
+  var err=document.getElementById('login-err');
+  if(!id||!pw){err.classList.add('show');return;}
+  err.classList.remove('show');
+  goTo('s-dash');
+}
+function doLogout(){goTo('s-login');}
+function goInput(){goTo('s-input');resetInput();}
+function goBack(){goTo('s-dash');}
+function setMethod(el){
+  document.querySelectorAll('.method-btn').forEach(function(b){b.classList.remove('active-m');});
+  el.classList.add('active-m');
+}
+function resetInput(){
+  document.getElementById('found-card').classList.remove('show');
+  document.getElementById('notfound-card').classList.remove('show');
+  document.getElementById('btn-access').classList.remove('show');
+  document.getElementById('loading-bar').classList.remove('show');
+  document.getElementById('loading-fill').style.width='0%';
+  document.getElementById('inp-nik').value='3271234567890001';
+  document.getElementById('inp-bpjs').value='';
+  document.getElementById('inp-nama').value='';
+  document.getElementById('inp-dob').value='';
+}
+function doSearch(){
+  var nik=document.getElementById('inp-nik').value.trim();
+  var bpjs=document.getElementById('inp-bpjs').value.trim();
+  var nama=document.getElementById('inp-nama').value.trim();
+  if(!nik&&!bpjs&&!nama){return;}
+  document.getElementById('found-card').classList.remove('show');
+  document.getElementById('notfound-card').classList.remove('show');
+  document.getElementById('btn-access').classList.remove('show');
+  var lb=document.getElementById('loading-bar');
+  var lf=document.getElementById('loading-fill');
+  var lt=document.getElementById('loading-text');
+  lb.classList.add('show');
+  lf.style.width='0%';
+  lt.textContent='Menghubungi SATUSEHAT...';
+  setTimeout(function(){lf.style.width='40%';lt.textContent='Menarik FHIR Bundle pasien...';},500);
+  setTimeout(function(){lf.style.width='75%';lt.textContent='Memproses AI summarizer...';},1200);
+  setTimeout(function(){
+    lf.style.width='100%';
+    lt.textContent='Selesai — 0,42 detik';
+    setTimeout(function(){
+      lb.classList.remove('show');
+      if(nik==='0000000000000000'){
+        document.getElementById('notfound-card').classList.add('show');
+      } else {
+        document.getElementById('found-card').classList.add('show');
+        document.getElementById('btn-access').classList.add('show');
+      }
+    },400);
+  },2100);
+}
+function goEmergency(){
+  sendPrompt('Tampilkan clinical summary mode darurat untuk pasien Bambang Sutrisno');
+}
+</script>
