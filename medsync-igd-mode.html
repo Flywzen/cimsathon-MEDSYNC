@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDSYNC — IGD Dashboard Prototype</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; min-height: 100vh; display: flex; justify-content: center; padding: 24px 16px; }
+.wrapper { width: 100%; max-width: 480px; }
+
+.app { background: #f5f5f3; min-height: 600px; border-radius: 12px; overflow: hidden; border: 0.5px solid #e0ddd4; }
+
+.topbar { background: #ffffff; border-bottom: 0.5px solid #e0ddd4; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.logo { font-size: 15px; font-weight: 500; color: #1a1a1a; letter-spacing: -0.3px; }
+.logo span { color: #185FA5; }
+.badge-live { background: #EAF3DE; color: #3B6D11; font-size: 12px; padding: 3px 8px; border-radius: 100px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888780; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #639922; display: inline-block; }
+
+.mode-toggle { display: flex; background: #ebebeb; border-radius: 8px; padding: 3px; margin: 12px 16px 0; gap: 3px; }
+.mode-btn { flex: 1; padding: 6px 0; font-size: 12px; font-weight: 500; border-radius: 6px; border: none; cursor: pointer; transition: background 0.15s; background: transparent; color: #888780; }
+.mode-btn.active { background: #ffffff; color: #1a1a1a; border: 0.5px solid #e0ddd4; }
+.mode-btn.active.danger { color: #993C1D; }
+.mode-btn.active.post { color: #185FA5; }
+
+.content { padding: 12px 16px 16px; }
+
+.alert-bar { background: #FAECE7; border: 0.5px solid #ff8156; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+.alert-bar-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.alert-icon { width: 14px; height: 14px; background: #D85A30; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 500; flex-shrink: 0; }
+.alert-title { font-size: 12px; font-weight: 500; color: #993C1D; }
+.alert-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.alert-pill { background: #F5C4B3; color: #712B13; font-size: 11px; padding: 3px 8px; border-radius: 99px; font-weight: 500; }
+
+.patient-card { background: #ffffff; border: 0.5px solid #7ebafd; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.patient-info { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: #B5D4F4; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #0C447C; flex-shrink: 0; }
+.patient-name { font-size: 15px; font-weight: 500; color: #1a1a1a; }
+.patient-meta { font-size: 12px; color: #888780; margin-top: 2px; }
+.timer-box { text-align: right; }
+.timer-label { font-size: 10px; color: #888780; }
+.timer-val { font-size: 22px; font-weight: 500; color: #639922; font-variant-numeric: tabular-nums; }
+.timer-sub { font-size: 10px; color: #888780; }
+
+.section-label { font-size: 11px; font-weight: 500; color: #888780; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; margin-top: 12px; }
+
+.cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.info-card { background: #ffffff; border: 0.5px solid #a4b4a7; border-radius: 12px; padding: 10px 12px; }
+.info-card.full { grid-column: 1 / -1; }
+.info-card.warn { border-color: #a4b4a7; }
+.info-card.ok { border-color: #7bbcfc; }
+.card-title { font-size: 11px; font-weight: 500; color: #888780; margin-bottom: 8px; }
+.card-item { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
+.card-item:last-child { margin-bottom: 0; }
+.item-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.item-dot.red { background: #E24B4A; }
+.item-dot.amber { background: #BA7517; }
+.item-dot.green { background: #3B6D11; }
+.item-text { font-size: 13px; color: #1a1a1a; line-height: 1.4; }
+.item-sub { font-size: 11px; color: #888780; }
+.source-tag { font-size: 10px; padding: 1px 6px; border-radius: 99px; margin-left: 4px; }
+.src-pkm { background: #E1F5EE; color: #085041; }
+.src-tele { background: #E6F1FB; color: #0C447C; }
+.src-rs { background: #EEEDFE; color: #3C3489; }
+
+.vital-old { background: #ffffff; border: 0.5px solid #7bbcfc; border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+.vital-old-label { font-size: 10px; color: #888780; margin-bottom: 6px; }
+.vital-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.vital-item { font-size: 12px; color: #888780; }
+.vital-item span { color: #1a1a1a; font-weight: 500; }
+
+.footer-note { text-align: center; font-size: 11px; color: #888780; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid #e0ddd4; }
+
+.post-section { display: none; }
+.post-section.active { display: block; }
+.emergency-section.hidden { display: none; }
+
+.form-card { background: #ffffff; border: 0.5px solid #e0ddd4; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+.form-label { font-size: 12px; font-weight: 500; color: #888780; margin-bottom: 6px; display: block; }
+.form-select { width: 100%; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 0.5px solid #c8c6bd; background: #f5f5f3; color: #1a1a1a; }
+.form-input { width: 100%; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 0.5px solid #c8c6bd; background: #f5f5f3; color: #1a1a1a; margin-bottom: 10px; }
+.form-textarea { width: 100%; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 0.5px solid #c8c6bd; background: #f5f5f3; color: #1a1a1a; resize: none; height: 64px; font-family: inherit; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-group { margin-bottom: 10px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.sync-btn { width: 100%; padding: 10px; background: #185FA5; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 12px; letter-spacing: -0.1px; }
+.sync-btn:hover { background: #0C447C; }
+
+.info-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 0.5px solid #e0ddd4; }
+.info-row:last-child { border-bottom: none; }
+.info-row-label { color: #888780; }
+.info-row-val { color: #1a1a1a; font-weight: 500; text-align: right; }
+
+.loop-note { background: #E6F1FB; border: 0.5px solid #B5D4F4; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #185FA5; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo"><span>MED</span>SYNC</div>
+      <div class="badge-live">Data Terintegrasi</div>
+    </div>
+    <div class="topbar-right">
+      <div class="dot"></div>
+      dr. Andi Pratama · IGD RSUP M. Hoesin
+    </div>
+  </div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active danger" id="btn-emergency" onclick="switchMode('emergency')">Mode darurat</button>
+    <button class="mode-btn" id="btn-post" onclick="switchMode('post')">Mode Pasca-stabilisasi</button>
+  </div>
+
+  <div class="content">
+
+    <div class="emergency-section" id="emergency-section">
+      <div class="alert-bar">
+        <div class="alert-bar-header">
+          <div class="alert-icon">!</div>
+          <div class="alert-title">Informasi kritis sebelum tindakan</div>
+        </div>
+        <div class="alert-items">
+          <div class="alert-pill">Alergi: Penisilin (anafilaktik)</div>
+          <div class="alert-pill">Antikoagulan aktif: Warfarin 5mg</div>
+          <div class="alert-pill">Riwayat perdarahan GI (2024)</div>
+        </div>
+      </div>
+
+      <div class="patient-card">
+        <div class="patient-info">
+          <div class="avatar">BS</div>
+          <div>
+            <div class="patient-name">Bambang Sutrisno</div>
+            <div class="patient-meta">62 th · L · BPJS 0001-2345-6789 · Gol. A+</div>
+          </div>
+        </div>
+      
+      </div>
+
+      <div class="section-label">Ringkasan cepat pasien</div>
+      <div class="cards-grid">
+
+        <div class="info-card warn">
+          <div class="card-title">Alergi obat</div>
+          <div class="card-item">
+            <div class="item-dot red"></div>
+            <div>
+              <div class="item-text">Penisilin <span class="source-tag src-pkm">Pkm Plaju</span></div>
+              <div class="item-sub">Anafilaktik — konfirmasi 2022</div>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="item-dot amber"></div>
+            <div>
+              <div class="item-text">Ibuprofen <span class="source-tag src-tele">Halodoc</span></div>
+              <div class="item-sub">Gatal-gatal — ringan</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-title">Penyakit kronis aktif</div>
+          <div class="card-item">
+            <div class="item-dot red"></div>
+            <div>
+              <div class="item-text">Diabetes Melitus T2</div>
+              <div class="item-sub">HbA1c 9.1% · Jan 2026 <span class="source-tag src-pkm">Pkm</span></div>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="item-dot amber"></div>
+            <div>
+              <div class="item-text">Hipertensi Gr. II</div>
+              <div class="item-sub">TD terakhir 160/95 <span class="source-tag src-pkm">Pkm</span></div>
+            </div>
+          </div>
+          <div class="card-item">
+            <div class="item-dot amber"></div>
+            <div>
+              <div class="item-text">Fibrilasi atrium</div>
+              <div class="item-sub">Dx 2023 <span class="source-tag src-rs">RSMH</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card full ok">
+          <div class="card-title">Terapi aktif</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px;">
+            <div class="card-item">
+              <div class="item-dot amber"></div>
+              <div><div class="item-text">Warfarin 5mg/hari</div><div class="item-sub">INR terakhir 2.8 — Feb 2026</div></div>
+            </div>
+            <div class="card-item">
+              <div class="item-dot green"></div>
+              <div><div class="item-text">Metformin 500mg 2x/hari</div><div class="item-sub">Aktif sejak 2020</div></div>
+            </div>
+            <div class="card-item">
+              <div class="item-dot green"></div>
+              <div><div class="item-text">Amlodipine 10mg/hari</div><div class="item-sub">Aktif sejak 2021</div></div>
+            </div>
+            <div class="card-item">
+              <div class="item-dot green"></div>
+              <div><div class="item-text">Bisoprolol 5mg/hari</div><div class="item-sub">Aktif sejak 2023</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card full">
+          <div class="card-title">Riwayat medis penting</div>
+          <div class="info-row">
+            <div class="info-row-label">Perdarahan GI <span class="source-tag src-rs">RSMH</span></div>
+            <div class="info-row-val">Okt 2024 · rawat inap 5 hari</div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-label">Konsultasi jantung <span class="source-tag src-tele">Alodokter</span></div>
+            <div class="info-row-val">Mar 2026 · EKG AF stabil</div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-label">Kontrol terakhir Puskesmas</div>
+            <div class="info-row-val">10 Apr 2026 · dr. Rina</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="vital-old">
+        <div class="vital-old-label">Vital kunjungan sebelumnya — Pkm Plaju, 10 Apr 2026</div>
+        <div class="vital-row">
+          <div class="vital-item">TD <span>160/95</span></div>
+          <div class="vital-item">Nadi <span>88 bpm</span></div>
+          <div class="vital-item">SpO2 <span>97%</span></div>
+          <div class="vital-item">GDS <span>224 mg/dL</span></div>
+          <div class="vital-item">BB <span>74 kg</span></div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Sumber data: SATUSEHAT & fasilitas kesehatan
+      </div>
+    </div>
+
+    <div class="post-section" id="post-section">
+      <div class="patient-card">
+        <div class="patient-info">
+          <div class="avatar">BS</div>
+          <div>
+            <div class="patient-name">Bambang Sutrisno</div>
+            <div class="patient-meta">62 th · L · IGD RSUP M. Hoesin · 11 Apr 2026, 14:22</div>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: #3B6D11; background: #EAF3DE; padding: 4px 10px; border-radius: 99px;">Stabil</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label class="form-label">Diagnosis IGD (ICD-10)</label>
+          <select class="form-select">
+            <option>I63.9 — Cerebral infarction, unspecified</option>
+            <option>I61.9 — Intracerebral haemorrhage, unspecified</option>
+            <option>G45.9 — Transient cerebral ischaemic attack</option>
+            <option>I64 — Stroke, not specified as haemorrhage or infarction</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-group">
+          <label class="form-label">Tindakan & terapi yang diberikan di IGD</label>
+          <textarea class="form-textarea" placeholder="cth: rt-PA IV 0.9 mg/kg, CT-scan kepala tanpa kontras, monitoring INR..."></textarea>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Warfarin — status di IGD</label>
+            <select class="form-select">
+              <option>Ditahan sementara</option>
+              <option>Dilanjutkan</option>
+              <option>Dihentikan permanen</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Disposisi pasien</label>
+            <select class="form-select">
+              <option>Rawat inap — Neurologi</option>
+              <option>Rawat inap — ICU</option>
+              <option>Rawat inap — Umum</option>
+              <option>Rujuk RS lain</option>
+              <option>Pulang dengan resep</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan untuk unit penerima</label>
+          <input class="form-input" type="text" placeholder="cth: INR perlu di-recheck, konsul kardiologi terjadwal..." />
+        </div>
+      </div>
+
+      <div class="loop-note">
+        Data diteruskan ke SIMRS untuk pencatatan rekam medis RS. Sinkronisasi ke SATUSEHAT berjalan di latar belakang.
+      </div>
+
+      <button class="sync-btn" onclick="alert('Data berhasil disinkronkan ke SATUSEHAT.\n\nUnit Neurologi & Pkm Plaju kini dapat mengakses update IGD ini.')">Simpan dan Lanjutkan</button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+var start = Date.now();
+var timerEl = document.getElementById('timer');
+setInterval(function() {
+  var elapsed = Math.floor((Date.now() - start) / 1000);
+  var m = Math.floor(elapsed / 60);
+  var s = elapsed % 60;
+  timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}, 1000);
+
+function switchMode(mode) {
+  var emergency = document.getElementById('emergency-section');
+  var post = document.getElementById('post-section');
+  var btnE = document.getElementById('btn-emergency');
+  var btnP = document.getElementById('btn-post');
+  if (mode === 'emergency') {
+    emergency.classList.remove('hidden');
+    post.classList.remove('active');
+    btnE.classList.add('active', 'danger');
+    btnP.classList.remove('active', 'post');
+  } else {
+    emergency.classList.add('hidden');
+    post.classList.add('active');
+    btnE.classList.remove('active', 'danger');
+    btnP.classList.add('active', 'post');
+  }
+}
+</script>
+</body>
+</html>
